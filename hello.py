@@ -29,19 +29,19 @@ class Role(db.Model):
     _tablename_ = 'roles'
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(64),unique=True)
+    users = db.relationship('User',backref='role')
 
     def __repr__(self):
         return '<Role %r>' % self.name
-    users = db.relationship('User',backref='role')
 
 class User(db.Model):
     _tablename_='users'
     id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(64),unique=True,index=True)
+    role_id = db.column(db.Integer,db.ForeignKey('roles.id'))
 
     def __repr__(self):
         return '<User %r>' % self.username
-    role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
 
 @app.route('/',methods=['GET','POST'])
 def index():
