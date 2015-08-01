@@ -1,5 +1,5 @@
 from flask import render_template, redirect, request, url_for, flash
-from flask.ext.login import login_user, login_required,current_user
+from flask.ext.login import login_user, logout_user, login_required,current_user
 from . import auth 
 from .. import db
 from ..models import User
@@ -41,7 +41,7 @@ def register():
 	           'auth/email/confirm', user=user, token=token)
 
 	flash('A confirmation email has been sent to you by email.')
-	return redirect(url_for('main.login'))
+	return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
 
 @auth.route('/confirm/<token>')
@@ -58,7 +58,7 @@ def confirm(token):
 @auth.before_app_request
 def before_request():
     if current_user.is_authenticated(): 
-        current_ser.ping()
+        current_user.ping()
         if not current_user.confirmed \
         	and request.endpoint[:5] != 'auth.' \
 		and request.endpoint != 'static':
