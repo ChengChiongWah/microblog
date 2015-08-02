@@ -27,7 +27,7 @@ class Role(db.Model):
 	    'Moderator': (Permission.FOLLOW |
 	                  Permission.WRITE_ARTICLES |
 			  Permission.MODERATE_COMMENTS, False),
-	    'Administraotr':(0xff, False)
+	    'Administrator':(0xff, False)
 	}
 	for r in roles:
 	    role = Role.query.filter_by(name=r).first()
@@ -58,7 +58,7 @@ class User(UserMixin, db.Model):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
 	if self.role is None:
-	    if self.role == current_app.config['FLASKY_ADMIN']:
+	    if self.email == current_app.config['FLASKY_ADMIN']:
 	        self.role = Role.query.filter_by(permissions=0xff).first()
 	    if self.role is None:
 	        self.role = Role.query.filter_by(default=True).first()
@@ -93,7 +93,7 @@ class User(UserMixin, db.Model):
 	db.session.add(self)
 	return True
     
-    def can(self, permisions):
+    def can(self, permissions):
         return self.role is not None and \
 	    (self.role.permissions & permissions) == permissions
 
