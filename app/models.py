@@ -29,6 +29,7 @@ class Role(db.Model):
 	             Permission.COMMENT |
 		     Permission.WRITE_ARTICLES,True),
 	    'Moderator': (Permission.FOLLOW |
+	                  Permission.COMMENT |
 	                  Permission.WRITE_ARTICLES |
 			  Permission.MODERATE_COMMENTS, False),
 	    'Administrator':(0xff, False)
@@ -37,13 +38,13 @@ class Role(db.Model):
 	    role = Role.query.filter_by(name=r).first()
 	    if role is  None:
 	        role = Role(name=r)
-	    role.permission = roles[r][0]
+	    role.permissions = roles[r][0]
 	    role.default = roles[r][1]
 	    db.session.add(role)
         db.session.commit()	
 
-def __repr__(self):
-    return '<Role %r>' %self.name
+    def __repr__(self):
+        return '<Role %r>' %self.name
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -123,6 +124,7 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
@@ -130,9 +132,6 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -142,3 +141,8 @@ class AnonymousUser(AnonymousUserMixin):
         return False
 
 login_manager.anonymous_user = AnonymousUser
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
