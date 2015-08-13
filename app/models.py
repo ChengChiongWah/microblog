@@ -27,12 +27,12 @@ class Role(db.Model):
         roles = {
 	    'User': (Permission.FOLLOW |
 	             Permission.COMMENT |
-		     Permission.WRITE_ARTICLES,True),
+		     Permission.WRITE_ARTICLES, True),
 	    'Moderator': (Permission.FOLLOW |
 	                  Permission.COMMENT |
 	                  Permission.WRITE_ARTICLES |
 			  Permission.MODERATE_COMMENTS, False),
-	    'Administrator':(0xff, False)
+	    'Administrator': (0xff, False)
 	}
 	for r in roles:
 	    role = Role.query.filter_by(name=r).first()
@@ -44,7 +44,7 @@ class Role(db.Model):
         db.session.commit()	
 
     def __repr__(self):
-        return '<Role %r>' %self.name
+        return '<Role %r>' % self.name
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -59,7 +59,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-    avatar_hash =db.Column(db.String(32))
+    avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __init__(self, **kwargs):
@@ -121,16 +121,9 @@ class User(UserMixin, db.Model):
 	return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
 	    url=url, hash=hash, size=size, default=default, rating=rating)
 
+
     def __repr__(self):
         return '<User %r>' % self.username
-
-
-class Post(db.Model):
-    __tablename__ = 'posts'
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -140,9 +133,19 @@ class AnonymousUser(AnonymousUserMixin):
     def is_administrator(self):
         return False
 
+
 login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
