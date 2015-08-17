@@ -83,7 +83,7 @@ class User(UserMixin, db.Model):
 				 backref=db.backref('followed', lazy='joined'),
 				 lazy='dynamic',
 				 cascade='all, delete-orphan')
-    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
 
     @staticmethod
     def generate_fake(count=100):
